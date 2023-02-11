@@ -1,0 +1,2 @@
+### Komodo Server
+Simple and lightweight middleware web framework for Deno. The framework design is inspired by already existing framework which is [Oak](https://github.com/oakserver/oak) and [Koa.js](https://github.com/koajs/koa). While Koa is NodeJS only and Oak support both Deno and NodeJS, Komodo is supposed to only work for Deno since every API in Komodo is actually Deno reserved API for example Request, URL, URLPattern, etc.
