@@ -17,7 +17,6 @@ export class Application {
 
   public async listen(opts: AppListenOpts) {
     const srv = Deno.listen(opts)
-    console.log(`Application is running`);
 
     for await (const conn of srv) {
       const httpConn = Deno.serveHttp(conn);
@@ -25,7 +24,7 @@ export class Application {
         const handle = composeMiddleware(this.middlewares);
         const response = new HttpResponseWriter();
         const ctx = new Context(event.request, response);
-        handle(ctx, (_ctx: Context)=>console.log("Done"));
+        handle(ctx, (_ctx: Context)=>{});
         event.respondWith(ctx.response.response());
       }
     }
