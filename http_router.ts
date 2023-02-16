@@ -1,25 +1,24 @@
-import { Context } from "./context.ts";
-import { composeMiddleware } from "./interface.ts";
-import type { Middleware, HttpMethod } from "./interface.ts";
+import { composeMiddleware } from "./deps.ts";
+import type { HttpContext, HttpMethod, HttpMiddleware } from "./http_interface.ts";
 
-export class Router {
-    private middlewares: Middleware[];
+export class HttpRouter {
+    private middlewares: HttpMiddleware[];
 
     public constructor() {
         this.middlewares = [];
     }
 
-    public routes(): Middleware {
+    public routes(): HttpMiddleware {
         return composeMiddleware(this.middlewares);
     }
 
-    public match(methods: HttpMethod[], path: string, handler: Middleware) {
-        this.middlewares.push((ctx: Context, next?: Middleware) => {
+    public match(methods: HttpMethod[], path: string, handler: HttpMiddleware) {
+        this.middlewares.push((ctx: HttpContext, next?: HttpMiddleware) => {
             const url = new URL(ctx.request.url);
             const pattern = new URLPattern(path, url.origin);
             if(methods.includes(ctx.request.method as HttpMethod) && pattern.test(url)) {
                 const res = pattern.exec(url);
-                if(res?.pathname.groups) ctx.urlParams = res?.pathname.groups;
+                if(res?.pathname.groups) ctx.request.urlParams = res?.pathname.groups;
                 return handler(ctx, next);
             }
             if(next) next(ctx);
@@ -27,23 +26,23 @@ export class Router {
         return this;
     }
 
-    public get(path: string, handler: Middleware) {
+    public get(path: string, handler: HttpMiddleware) {
         return this.match(["GET"], path, handler);
     }
 
-    public post(path: string, handler: Middleware) {
+    public post(path: string, handler: HttpMiddleware) {
         return this.match(["POST"], path, handler);
     }
 
-    public put(path: string, handler: Middleware) {
+    public put(path: string, handler: HttpMiddleware) {
         return this.match(["PUT"], path, handler);
     }
 
-    public delete(path: string, handler: Middleware) {
+    public delete(path: string, handler: HttpMiddleware) {
         return this.match(["DELETE"], path, handler);
     }
 
-    public all(path: string, handler: Middleware) {
+    public all(path: string, handler: HttpMiddleware) {
         return this.match([ 'HEAD','OPTIONS','GET','PUT','PATCH','POST','DELETE' ], path, handler);
     }
 }
